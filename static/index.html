@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个性化语言风格转换系统</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-value {
+            min-width: 3rem;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-area {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f1f5f9;
+            border-radius: 12px;
+            min-height: 100px;
+            position: relative;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .result-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text);
+            white-space: pre-wrap;
+        }
+
+        .placeholder {
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: var(--error);
+            background: #fef2f2;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 2rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 个性化语言风格转换系统</h1>
+            <p>基于语义重构的 LoRA 微调 Qwen2.5 模型</p>
+        </header>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="input-text">输入文本</label>
+                <textarea id="input-text" placeholder="请输入要转换的文本..."></textarea>
+            </div>
+
+            <div class="controls">
+                <div>
+                    <label for="style-select">目标风格</label>
+                    <select id="style-select">
+                        <option value="正式">📝 正式 - 书面化、正式的表达</option>
+                        <option value="口语化">💬 口语化 - 日常对话风格</option>
+                        <option value="简洁">✂️ 简洁 - 精炼、去冗余</option>
+                        <option value="丰富">✨ 丰富 - 扩展细节、增加修饰</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="max-tokens">生成长度: <span id="tokens-value">150</span> tokens</label>
+                    <div class="range-container">
+                        <input type="range" id="max-tokens" min="50" max="300" value="150" step="10">
+                    </div>
+                </div>
+            </div>
+
+            <button id="convert-btn" onclick="transfer()">🚀 开始转换</button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>正在转换中，请稍候...</p>
+                <p style="font-size: 0.9rem; color: var(--text-light);">首次加载模型可能需要 1-2 分钟</p>
+            </div>
+
+            <div class="result-area" id="result-area" style="display: none;">
+                <div class="result-header">
+                    <span class="badge" id="result-style"></span>
+                    <button class="copy-btn" onclick="copyResult()">📋 复制</button>
+                </div>
+                <div class="result-text" id="result-text"></div>
+            </div>
+
+            <div id="error-area" style="display: none;"></div>
+        </div>
+
+        <footer>
+            <p>基于 Qwen2.5-1.5B + LoRA 微调 | 训练数据: 1196 条风格配对样本</p>
+            <p style="margin-top: 0.5rem;">© 2024 个性化语言风格转换系统</p>
+        </footer>
+    </div>
+
+    <script>
+        // 更新滑块显示值
+        document.getElementById('max-tokens').addEventListener('input', function(e) {
+            document.getElementById('tokens-value').textContent = e.target.value;
+        });
+
+        // 复制结果
+        function copyResult() {
+            const text = document.getElementById('result-text').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.textContent = '✓ 已复制';
+                setTimeout(() => btn.textContent = '📋 复制', 2000);
+            });
+        }
+
+        // 显示错误
+        function showError(message) {
+            const errorArea = document.getElementById('error-area');
+            errorArea.innerHTML = `<div class="error">${message}</div>`;
+            errorArea.style.display = 'block';
+        }
+
+        // 隐藏错误
+        function hideError() {
+            document.getElementById('error-area').style.display = 'none';
+        }
+
+        // 调用 API 进行转换
+        async function transfer() {
+            const text = document.getElementById('input-text').value.trim();
+            const style = document.getElementById('style-select').value;
+            const maxTokens = parseInt(document.getElementById('max-tokens').value);
+
+            if (!text) {
+                showError('请输入要转换的文本');
+                return;
+            }
+
+            hideError();
+            document.getElementById('result-area').style.display = 'none';
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('convert-btn').disabled = true;
+
+            try {
+                const response = await fetch('/api/transfer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        style: style,
+                        max_tokens: maxTokens,
+                        temperature: 0.8
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '转换失败');
+                }
+
+                const data = await response.json();
+                
+                document.getElementById('result-style').textContent = data.style;
+                document.getElementById('result-text').textContent = data.result;
+                document.getElementById('result-area').style.display = 'block';
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('convert-btn').disabled = false;
+            }
+        }
+
+        // 支持 Ctrl+Enter 快捷键
+        document.getElementById('input-text').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                transfer();
+            }
+        });
+    </script>
+</body>
+</html>
